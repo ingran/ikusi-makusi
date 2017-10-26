@@ -2,7 +2,7 @@
 
 **Written by:** _[EA2EGA](https://github.com/EA2EGA)_ and  _[RDCH106](https://github.com/RDCH106)_ - _[Ingran Engineering S.L.](https://github.com/ingran)_  
 
-Version 0.90
+[Check latest version](https://github.com/ingran/ikusi-makusi/releases/latest)
 
 ### **Licensing**
 
