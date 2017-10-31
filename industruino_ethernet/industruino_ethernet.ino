@@ -34,7 +34,7 @@ If you want to use all the functions of the Software you should use a SD card.
 At the first boot the EEPROM variables will be burnt with the default options.
 The default network setting is DHCP, so the it will try to aqquire a IP from
 a DHCP server. If it fails to do so in 60 seconds, it will load the 192.168.1.177/24.
-Anyway you will be able to see the IP in the screed "Red", at this point you can
+Anyway you will be able to see the IP in the screen "Red", at this point you can
 access via a web browser and configure all parameters.
 
 Requeriments / Dependencies:
@@ -552,7 +552,7 @@ byte Alarmas_out_flag[]={0,0,0,0};
 byte Alarmas_unlatched_flags[]={0,0,0,0};
 
 
-//Union Used for Converting ModBus Float32 values to C++ float values. Depending on BigEndian or LowEndian, implement in different while using it.
+//Union Used for Converting ModBus Float32 values to C++ float values. Depending on BigEndian or LowEndian, implement in different way while using it.
 union u_tag {	
 	float f;
 	unsigned int asfloat[2];
@@ -654,11 +654,6 @@ EthernetClient clientk;
 byte ethOK=0; //Ethernet Status
 byte dhcp_en=0;
 
-unsigned long unixTime=0;
-char timeServer[] = "es.pool.ntp.org"; // time.nist.gov NTP server
-//const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-//byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
-
 const byte node_id=10;
 unsigned long time1, time_temp2, purge_time,time_temp, timepost=0,  timepost_sd=0;
 unsigned long post_interval=10000, display_loop;
@@ -713,15 +708,9 @@ char *myStrings[]={"Deshabilitado","Pres(Bar)", "Pres(m.c.a.)", "Pres(KG/cm3)",
 	38=Q (m3/s) - Medida de pulsos de Optoacoplador
 */
 
-// Flowmeter Type
-byte flowmter_type=0;	//0=None, 1=485, 2=Pulse
-byte flowmter_off=0;
+// Flowmeter Off
 
 //Pulse Meter variables
-byte pulse_enabled=0, pulse_input_pin=0, pulse_max_time=0;
-int pulse_max_pulses;
-float liters_per_pulse=0;
-float Q_flow_Pulse=0;		//Flowmeter Q Pulse Count
 float Q_flow_opto[4]={0,0,0,0};
 byte opto_round=0;
 
@@ -850,32 +839,6 @@ void sendNTPpacket(char* address) {
   Udp.beginPacket(address, 123); //NTP requests are to port 123
   Udp.write((const uint8_t*)IncomingUDP, INPUT_SIZE);
   Udp.endPacket();
-}
-
-void NTPUnixTime()
-{
-  sendNTPpacket(timeServer); // send an NTP packet to a time server
-  delay(5000);
-  if (Udp.parsePacket()) {
-    // We've received a packet, read the data from it
-    Udp.read(IncomingUDP, INPUT_SIZE); // read the packet into the buffer
-
-    // the timestamp starts at byte 40 of the received packet and is four bytes,
-    // or two words, long. First, extract the two words:
-
-    unsigned long highWord = word(IncomingUDP[40], IncomingUDP[41]);
-    unsigned long lowWord = word(IncomingUDP[42], IncomingUDP[43]);
-    // combine the four bytes (two words) into a long integer
-    // this is NTP time (seconds since Jan 1 1900):
-    unsigned long secsSince1900 = highWord << 16 | lowWord;
-
-    // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-    const unsigned long seventyYears = 2208988800UL;
-    // subtract seventy years:
-    unsigned long epoch = secsSince1900 - seventyYears;
-    unixTime= epoch;
-  }
-
 }
 
 void radio_form_builder(WebServer &server, char *menu[],char *text[], char name[], int size, int selected)
@@ -3092,8 +3055,8 @@ void setup()
 				Watchdog.reset();	//Resetear el Watchdog
 				if (syncron_enable==0)
 				{
+					//Sync here wathever you want to sync at boot
 					SyncOK=2;
-					unixTime=10000;
 				}
 				else if (clientk.connect(target_adrs, 80))
 				{
@@ -3544,17 +3507,7 @@ void load_eeprom()
 		type_tmp=type_tmp+5;
   #endif
   post_interval=(type_tmp)*1000;
-  
-  //Load flowmeters / pulse counter parameters
-  EEPROM.get( 0xA0, flowmter_type );
-  EEPROM.get( 0xAE, flowmter_off );
-  EEPROM.get( 0xA1, pulse_input_pin );
-  EEPROM.get( 0xA2, pulse_max_time );
-  EEPROM.get( 0xA8, pulse_max_pulses );
-  EEPROM.get( 0xAA, liters_per_pulse );
-  /*EEPROM.get( 0xB0, reed_constant );
-  EEPROM.get( 0xB4, reed_max_pulses );*/
-  
+    
   //Load I/O
   j=0;
   while (j<10) //Load I/O
@@ -5577,34 +5530,5 @@ void loop()
   {
 	  display_bottom_status=0;
   }
-  
-  /*if ((unixTime<10000)&&((time_temp-last_sync_try) > 20000))
-  {
-	display_bottom_status=4;
-	draw_screen();
-	NTPUnixTime();
-	//unixTime=webUnixTime(clientk);
-	
-	//setTime(unixTime);
-	last_sync_try=time_temp;
-	
-	if(unixTime>10000)
-	{
-		//time_t t = now();
-		String print3;
-		File myFile = SD.open("log.txt", FILE_WRITE);
-		myFile.print("[");
-		myFile.print(reboot_count);
-		myFile.print(" - ");
-		//print3=print3+year(t)+"/"+month(t)+"/"+day(t)+" "+hour(t)+":"+minute(t)+":"+second(t);
-		myFile.print(print3);
-		myFile.print("]");
-		myFile.println(" T Sync");
-		// close the file:
-		myFile.close();		
-		
-	}
-  }
-  */
 
 }
