@@ -37,6 +37,11 @@ a DHCP server. If it fails to do so in 60 seconds, it will load the 192.168.1.17
 Anyway you will be able to see the IP in the screed "Red", at this point you can
 access via a web browser and configure all parameters.
 
+Requeriments / Dependencies:
+
+For an adecuate DHCP Timeout, replace timeout values in the file \Ethernet2\src\Dhcp.cpp:
+int beginWithDHCP(uint8_t *, unsigned long timeout = 3000, unsigned long responseTimeout = 2000);  
+
 Screen Number types:
 
 0-14: Status Screens (System Health, Netoworking, Modbus status, Remoto, Alarm Historic, RPi messages, Info Messages)
@@ -3012,7 +3017,7 @@ void setup()
   }
   
   
-  countdownMS = Watchdog.enable(10000); //Enable Watchdog 
+  countdownMS = Watchdog.enable(20000); //Enable Watchdog 
   
   RTCind.get(rtc,true); 
   RTCind.start(true);
@@ -3026,8 +3031,7 @@ void setup()
   } while( u8g.nextPage() );
   delay(2000);
   Watchdog.reset();	//Resetear el Watchdog
-  
-  
+    
   while (init_status<10)
   {  
 	  u8g.firstPage();  //Dibujar
@@ -3059,8 +3063,8 @@ void setup()
 			}
 			
 			delay(1000);
-			//W5100.setRetransmissionTime(10000); //1 second
-			//W5100.setRetransmissionCount(2);
+			w5500.setRetransmissionTime(10000); //1 second
+			w5500.setRetransmissionCount(2);
 			delay(100);
 			Watchdog.reset();	//Resetear el Watchdog
 			//Arrancar el Ethernet
