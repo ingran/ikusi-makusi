@@ -134,7 +134,7 @@ byte SDOK=0;
 Sd2Card card;
 SdVolume volume;
 
-#define sw_ver "1.0A"
+#define sw_ver "0.91"
 
 #define Industruino_logo_width 128
 #define Industruino_logo_height 64
@@ -609,7 +609,7 @@ byte mac[] = { 0xDE, 0xDA, 0xBE, 0xAA, 0xAA, 0xAA };
 byte ip[] = { 192, 168, 1, 177 };
 byte gateway[] = { 192, 168, 1, 17 };
 byte subnet[] = { 255, 255, 255, 0 };
-IPAddress dnServer(8, 8, 8, 8);
+byte dnServer[] = {8, 8, 8, 8};
 byte syncron_enable=0;
 
 const int backlightPin = 26; // PWM output pin that the LED backlight is attached to, different in Industruino 32u4
@@ -1173,7 +1173,7 @@ void indexHTML(WebServer &server, WebServer::ConnectionType type, char *url_tail
 			server.printP(Tail_end);
 			#endif
 		    int o;
-			countdownMS = Watchdog.enable(4000);
+			countdownMS = Watchdog.enable(500);
 			while (1)
 			{
 				o=0;
@@ -2962,7 +2962,7 @@ void draw_screen()
 
 void setup()
 {
-  EEPROM.begin();
+  EEPROM.start();
     
   load_eeprom();	//Load Analog Inputs calibration values to offset[4] and slope[4] and others
   
@@ -2989,13 +2989,26 @@ void setup()
   
   //digitalWrite(10, LOW);
   
+  pinMode(backlightPin, OUTPUT); //set backlight pin to output 
   
-  if ((digitalRead(25)==0&&digitalRead(23)==0)||(('O'!=EEPROM.read(0x00))&&('K'!=EEPROM.read(0x01))));
+  byte e0;
+  byte e1;
+  EEPROM.get( 0x00, e0 );
+  EEPROM.get( 0x01, e1 );
+  
+  if ((digitalRead(25)==0&&digitalRead(23)==0)||(('O'!=e0)&&('K'!=e1)))
   {
 	burnDefaults();
 	byte out2;
 	out2 = 'O';	EEPROM.put( 0x00, out2 );
 	out2 = 'K';	EEPROM.put( 0x01, out2 );
+	for (int ck=0;ck<20;ck++){
+		analogWrite(backlightPin, 0); //set backligth to MAX
+		delay(100);
+		analogWrite(backlightPin, 255); //set backligth to MAX
+		delay(50);
+	}
+	
   }
   
   
@@ -3005,7 +3018,6 @@ void setup()
   RTCind.start(true);
   
   u8g.setRot180();	//Rotate Screen
-  pinMode(backlightPin, OUTPUT); //set backlight pin to output 
   analogWrite(backlightPin, 255); //set backligth to MAX
  
   u8g.firstPage();  //Dibujar el Logo
@@ -3444,7 +3456,7 @@ void load_eeprom()
 	j=0;
 	while (j<4)
 	{
-		//gateway[j]=EEPROM.read(0x30+j);
+		gateway[j]=EEPROM.read(0x30+j);
 		j++;
 	}
 	
