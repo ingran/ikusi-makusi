@@ -1,8 +1,8 @@
 ## Ikusi Makusi for Industruino D21G
 
-**Written by:** _EA2EGA_. and  _RDCH106_ - _Ingran Engineering S.L._.  
+**Written by:** _[EA2EGA](https://github.com/EA2EGA)_ and  _[RDCH106](https://github.com/RDCH106)_ - _[Ingran Engineering S.L.](https://github.com/ingran)_  
 
-Version 0.90
+[Check latest version](https://github.com/ingran/ikusi-makusi/releases/latest)
 
 ### **Licensing**
 
@@ -10,6 +10,8 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+[GNU General Public License v3.0](https://github.com/ingran/ikusi-makusi/blob/master/LICENSE)
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
