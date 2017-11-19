@@ -555,7 +555,7 @@ byte Alarmas_unlatched_flags[]={0,0,0,0};
 //Union Used for Converting ModBus Float32 values to C++ float values. Depending on BigEndian or LowEndian, implement in different way while using it.
 union u_tag {	
 	float f;
-	unsigned int asfloat[2];
+	unsigned short asfloat[2];
 } u;
 
 union u_tag2 {	
